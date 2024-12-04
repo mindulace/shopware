@@ -38,6 +38,7 @@ export default {
             isLoading: false,
             customerNumberPreview: '',
             defaultSalutationId: null,
+            isSameBilling: true,
         };
     },
 
@@ -84,37 +85,6 @@ export default {
 
         billingAddress() {
             return this.customer !== null ? this.customer.addresses.get(this.customer.defaultBillingAddressId) : null;
-        },
-
-        isSameBilling: {
-            get() {
-                if (this.customer === null) {
-                    return true;
-                }
-
-                return this.customer.defaultBillingAddressId === this.customer.defaultShippingAddressId;
-            },
-
-            set(newValue) {
-                if (newValue === true) {
-                    this.customer.defaultShippingAddressId = this.customer.defaultBillingAddressId;
-
-                    // remove all addresses but default billing...
-                    if (this.customer.isNew()) {
-                        this.customer.addresses = this.customer.addresses.filter((address) => {
-                            return address.id === this.customer.defaultBillingAddressId;
-                        });
-                    }
-
-                    return;
-                }
-
-                const shippingAddress = this.addressRepository.create();
-                shippingAddress.salutationId = this.defaultSalutationId;
-
-                this.customer.addresses.add(shippingAddress);
-                this.customer.defaultShippingAddressId = shippingAddress.id;
-            },
         },
 
         validCompanyField() {
@@ -172,6 +142,27 @@ export default {
             Shopware.State.dispatch('error/removeApiError', {
                 expression: `customer_address.${this.billingAddress?.id}.company`,
             });
+        },
+
+        isSameBilling(sameBilling) {
+            if (sameBilling === true) {
+                this.customer.defaultShippingAddressId = this.customer.defaultBillingAddressId;
+
+                // remove all addresses but default billing...
+                if (this.customer.isNew()) {
+                    this.customer.addresses = this.customer.addresses.filter((address) => {
+                        return address.id === this.customer.defaultBillingAddressId;
+                    });
+                }
+
+                return;
+            }
+
+            const shippingAddress = this.addressRepository.create();
+            shippingAddress.salutationId = this.defaultSalutationId;
+
+            this.customer.addresses.add(shippingAddress);
+            this.customer.defaultShippingAddressId = shippingAddress.id;
         },
     },
 

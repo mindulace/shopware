@@ -225,9 +225,14 @@ describe('src/module/sw-order/component/sw-order-new-customer-modal', () => {
                 defaultBillingAddressId: 'billing-address-id',
                 isNew: jest.fn(() => false),
             },
+
+            isSameBilling: false,
         });
 
-        wrapper.vm.isSameBilling = true;
+        await wrapper.setData({
+            isSameBilling: true,
+        });
+
         expect(wrapper.vm.customer.defaultShippingAddressId).toBe('billing-address-id');
     });
 
@@ -243,9 +248,13 @@ describe('src/module/sw-order/component/sw-order-new-customer-modal', () => {
                 ]),
                 isNew: jest.fn(() => true),
             },
+
+            isSameBilling: false,
         });
 
-        wrapper.vm.isSameBilling = true;
+        await wrapper.setData({
+            isSameBilling: true,
+        });
 
         expect(wrapper.vm.customer.addresses.has('shipping-address-id')).toBe(false);
         expect(wrapper.vm.customer.addresses.has('billing-address-id')).toBe(true);
@@ -265,7 +274,9 @@ describe('src/module/sw-order/component/sw-order-new-customer-modal', () => {
             },
         });
 
-        wrapper.vm.isSameBilling = false;
+        await wrapper.setData({
+            isSameBilling: false,
+        });
 
         expect(wrapper.vm.customer.defaultShippingAddressId).toBe('new-shipping-address-id');
         expect(wrapper.vm.customer.addresses.has('new-shipping-address-id')).toBe(true);
