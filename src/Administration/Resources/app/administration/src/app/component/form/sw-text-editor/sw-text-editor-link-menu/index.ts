@@ -24,6 +24,7 @@ interface TextEditorLinkMenuConfig {
 
 /**
  * @package admin
+ * @deprecated tag:v6.8.0 - Will be removed, use mt-text-editor instead.
  *
  * @private
  */

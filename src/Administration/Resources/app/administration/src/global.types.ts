@@ -33,6 +33,11 @@ import type { Slots } from '@vue/runtime-core';
 import type { Store, mapActions, mapGetters, mapMutations, mapState } from 'vuex';
 import type * as mapErrors from 'src/app/service/map-errors.service';
 import type JsonApiParserService from 'src/core/service/jsonapi-parser.service';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// Needed for the Editor types
+import type { Editor as CoreEditor, EditorOptions } from '@tiptap/core';
+import type Link from "@tiptap/extension-link";
+/* eslint-enable @typescript-eslint/no-unused-vars */
 import type { ExtensionsState } from './app/state/extensions.store';
 import type { ComponentConfig } from './core/factory/async-component.factory';
 import type { TabsState } from './app/state/tabs.store';

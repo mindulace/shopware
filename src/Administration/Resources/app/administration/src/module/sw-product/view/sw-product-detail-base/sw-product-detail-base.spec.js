@@ -60,6 +60,7 @@ async function createWrapper() {
                 'router-link': true,
                 'sw-skeleton': true,
                 'sw-extension-teaser-popover': true,
+                'mt-text-editor': true,
             },
             mocks: {
                 $route: {

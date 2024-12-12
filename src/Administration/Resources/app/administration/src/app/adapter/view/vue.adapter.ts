@@ -76,7 +76,7 @@ export default class VueAdapter extends ViewAdapter {
         this.app.config.compilerOptions.whitespace = 'preserve';
         this.app.config.performance = process.env.NODE_ENV !== 'production';
         this.app.config.globalProperties.$t = i18n.global.t;
-        this.app.config.globalProperties.$tc = i18n.global.tc;
+        this.app.config.globalProperties.$tc = i18n.global.t;
         this.app.config.warnHandler = (msg: string, instance: unknown, trace: string) => {
             const warnArgs = [
                 `[Vue warn]: ${msg}`,
@@ -141,7 +141,7 @@ export default class VueAdapter extends ViewAdapter {
 
         // Add global properties to root view instance
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-        this.app.$tc = i18n.global.tc;
+        this.app.$tc = i18n.global.t;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
         this.app.$t = i18n.global.t;
 
@@ -258,7 +258,6 @@ export default class VueAdapter extends ViewAdapter {
             'MtColorpicker',
             'MtDatepicker',
             'MtEmailField',
-            'MtExternalLink',
             'MtNumberField',
             'MtPasswordField',
             'MtSelect',
@@ -266,7 +265,6 @@ export default class VueAdapter extends ViewAdapter {
             'MtSwitch',
             'MtTextField',
             'MtTextarea',
-            'MtUrlField',
             'MtIcon',
             'MtDataTable',
             'MtPagination',
@@ -274,10 +272,15 @@ export default class VueAdapter extends ViewAdapter {
             'MtToast',
             'MtFloatingUi',
             'MtPopover',
+            'MtTextEditorToolbarButton',
+            'MtModal',
+            'MtModalRoot',
+            'MtModalClose',
         ];
 
         // Disable compat for meteor components
         meteorComponents.forEach((componentName) => {
+            // @ts-expect-error - compatConfig is not typed
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, max-len
             MeteorImport[componentName].compatConfig = Object.fromEntries(
                 Object.keys(Shopware.compatConfig).map((key) => [
@@ -289,6 +292,7 @@ export default class VueAdapter extends ViewAdapter {
 
         meteorComponents.forEach((componentName) => {
             const componentNameAsKebabCase = Shopware.Utils.string.kebabCase(componentName);
+            // @ts-expect-error - component exists
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             this.app.component(componentNameAsKebabCase, MeteorImport[componentName]);
         });
@@ -538,11 +542,13 @@ export default class VueAdapter extends ViewAdapter {
         void store.dispatch('setAdminLocale', lastKnownLocale);
 
         const options = {
+            legacy: false,
             locale: lastKnownLocale,
             fallbackLocale,
             silentFallbackWarn: true,
             sync: true,
             messages,
+            allowComposition: true,
         };
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
