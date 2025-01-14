@@ -112,6 +112,6 @@ class UrlEncodingTwigFilterTest extends TestCase
 
         $media->setUrl((string) $url);
 
-        static::assertStringEndsWith('%28image%20with%20spaces%20and%20brackets%29.png', (string) $filter->encodeMediaUrl($media));
+        static::assertStringEndsWith('%2528image%2520with%2520spaces%2520and%2520brackets%2529.png', (string) $filter->encodeMediaUrl($media));
     }
 }
