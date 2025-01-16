@@ -3,12 +3,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import {
-    MtTextEditorToolbarButton,
-    MtModalClose,
-    MtModal,
-    MtModalRoot,
-} from '@shopware-ag/meteor-component-library';
+import { MtTextEditorToolbarButton, MtModalClose, MtModal, MtModalRoot } from '@shopware-ag/meteor-component-library';
 
 const responses = global.repositoryFactoryMock.responses;
 
@@ -21,7 +16,7 @@ responses.addResponse({
             {
                 id: 'YourId',
                 attributes: {
-                    id: 'YourId'
+                    id: 'YourId',
                 },
                 relationships: [],
             },
@@ -31,8 +26,8 @@ responses.addResponse({
 
 const seoUrlPrefixId = '124c71d524604ccbad6042edce3ac799';
 
-function findByText (wrap, selector, text) {
-    return wrap.findAll(selector).filter(n => n.text().match(text));
+function findByText(wrap, selector, text) {
+    return wrap.findAll(selector).filter((n) => n.text().match(text));
 }
 
 function createEditorStub() {
@@ -47,24 +42,26 @@ function createEditorStub() {
 
             return undefined;
         },
-            isActive: () => false,
+        isActive: () => false,
         chain: () => editorStub,
         focus: () => editorStub,
         extendMarkRange: () => editorStub,
         setLink: jest.fn(() => editorStub),
         run: () => editorStub,
-    }
+    };
 
     return editorStub;
 }
 
-async function createWrapper(additionalOptions = {
-    slots: {},
-    props: {},
-}) {
+async function createWrapper(
+    additionalOptions = {
+        slots: {},
+        props: {},
+    },
+) {
     const editorStub = createEditorStub();
     const buttonStub = {
-        label: 'stub.label'
+        label: 'stub.label',
     };
 
     return mount(await wrapTestComponent('sw-text-editor-toolbar-button-link', { sync: true }), {
@@ -86,8 +83,8 @@ async function createWrapper(additionalOptions = {
                 'sw-category-tree-field': true,
                 'sw-media-field': true,
                 teleport: true,
-            }
-        }
+            },
+        },
     });
 }
 
@@ -153,15 +150,15 @@ describe('src/app/component/meteor-wrapper/mt-text-editor/mt-text-editor-toolbar
                                 href: `${seoUrlPrefixId}/detail/exampleId/`,
                                 target: 'stub.target',
                                 rel: 'stub.rel',
-                                title: 'stub.title'
+                                title: 'stub.title',
                             };
                         }
 
                         return undefined;
                     },
                     isActive: () => true,
-                }
-            }
+                },
+            },
         });
 
         // Get button with aria-label "stub.label"
@@ -197,15 +194,15 @@ describe('src/app/component/meteor-wrapper/mt-text-editor/mt-text-editor-toolbar
                                 href: `${seoUrlPrefixId}/navigation/exampleId/`,
                                 target: 'stub.target',
                                 rel: 'stub.rel',
-                                title: 'stub.title'
+                                title: 'stub.title',
                             };
                         }
 
                         return undefined;
                     },
                     isActive: () => true,
-                }
-            }
+                },
+            },
         });
 
         // Get button with aria-label "stub.label"
@@ -243,15 +240,15 @@ describe('src/app/component/meteor-wrapper/mt-text-editor/mt-text-editor-toolbar
                                 href: `${seoUrlPrefixId}/mediaId/exampleId/`,
                                 target: 'stub.target',
                                 rel: 'stub.rel',
-                                title: 'stub.title'
+                                title: 'stub.title',
                             };
                         }
 
                         return undefined;
                     },
                     isActive: () => true,
-                }
-            }
+                },
+            },
         });
 
         // Get button with aria-label "stub.label"
@@ -287,7 +284,7 @@ describe('src/app/component/meteor-wrapper/mt-text-editor/mt-text-editor-toolbar
                                 href: 'mailto:test@example.com',
                                 target: 'stub.target',
                                 rel: 'stub.rel',
-                                title: 'stub.title'
+                                title: 'stub.title',
                             };
                         }
 
@@ -326,7 +323,7 @@ describe('src/app/component/meteor-wrapper/mt-text-editor/mt-text-editor-toolbar
                                 href: 'tel:+123456789',
                                 target: 'stub.target',
                                 rel: 'stub.rel',
-                                title: 'stub.title'
+                                title: 'stub.title',
                             };
                         }
 
@@ -453,14 +450,13 @@ describe('src/app/component/meteor-wrapper/mt-text-editor/mt-text-editor-toolbar
                             return {
                                 href: `${seoUrlPrefixId}/detail/exampleId/`,
                                 target: null,
-
                             };
                         }
 
                         return undefined;
                     },
-                }
-            }
+                },
+            },
         });
 
         // Get button with aria-label "stub.label"
@@ -498,8 +494,8 @@ describe('src/app/component/meteor-wrapper/mt-text-editor/mt-text-editor-toolbar
 
                         return undefined;
                     },
-                }
-            }
+                },
+            },
         });
 
         // Get button with aria-label "stub.label"
@@ -538,8 +534,8 @@ describe('src/app/component/meteor-wrapper/mt-text-editor/mt-text-editor-toolbar
 
                         return undefined;
                     },
-                }
-            }
+                },
+            },
         });
 
         // Get button with aria-label "stub.label"
@@ -576,9 +572,9 @@ describe('src/app/component/meteor-wrapper/mt-text-editor/mt-text-editor-toolbar
                         }
 
                         return undefined;
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
 
         // Get button with aria-label "stub.label"
@@ -615,9 +611,9 @@ describe('src/app/component/meteor-wrapper/mt-text-editor/mt-text-editor-toolbar
                         }
 
                         return undefined;
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
 
         // Get button with aria-label "stub.label"

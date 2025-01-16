@@ -4,10 +4,12 @@
 
 import { mount } from '@vue/test-utils';
 
-async function createWrapper(additionalOptions = {
-    slots: {},
-    props: {},
-}) {
+async function createWrapper(
+    additionalOptions = {
+        slots: {},
+        props: {},
+    },
+) {
     return mount(await wrapTestComponent('mt-text-editor', { sync: true }), {
         props: {
             ...additionalOptions.props,
@@ -18,8 +20,8 @@ async function createWrapper(additionalOptions = {
         global: {
             stubs: {
                 'sw-text-editor-toolbar-button-link': true,
-            }
-        }
+            },
+        },
     });
 }
 
@@ -43,8 +45,8 @@ describe('src/app/component/meteor-wrapper/mt-text-editor', () => {
 
         const wrapper = await createWrapper({
             slots: {
-                'button_link': buttonLinkSlotContent,
-            }
+                button_link: buttonLinkSlotContent,
+            },
         });
 
         // Find the slot content in the rendered component
@@ -61,7 +63,7 @@ describe('src/app/component/meteor-wrapper/mt-text-editor', () => {
                         label: 'custom.button.label',
                     },
                 ],
-            }
+            },
         });
 
         // Check if button with aria-label "custom.button.label" is present

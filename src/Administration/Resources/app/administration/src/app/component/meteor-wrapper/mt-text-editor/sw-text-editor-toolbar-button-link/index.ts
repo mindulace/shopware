@@ -1,13 +1,12 @@
-import type {PropType} from "vue";
-import type {Editor} from "@tiptap/vue-3";
-import type {
-    CustomButton,
-} from "@shopware-ag/meteor-component-library/dist/esm/components/form/mt-text-editor/_internal/mt-text-editor-toolbar";
+import type { PropType } from 'vue';
+import type { Editor } from '@tiptap/vue-3';
+// eslint-disable-next-line max-len
+import type { CustomButton } from '@shopware-ag/meteor-component-library/dist/esm/components/form/mt-text-editor/_internal/mt-text-editor-toolbar';
 import template from './sw-text-editor-toolbar-button-link.html.twig';
 import './sw-text-editor-toolbar-button-link.scss';
-import type EntityCollectionType from "../../../../../core/data/entity-collection.data";
-import type RepositoryType from "../../../../../core/data/repository.data";
-import type CriteriaType from "../../../../../core/data/criteria.data";
+import type EntityCollectionType from '../../../../../core/data/entity-collection.data';
+import type RepositoryType from '../../../../../core/data/repository.data';
+import type CriteriaType from '../../../../../core/data/criteria.data';
 
 type LinkCategories = 'link' | 'detail' | 'navigation' | 'media' | 'email' | 'phone';
 
@@ -57,9 +56,9 @@ Shopware.Component.register('sw-text-editor-toolbar-button-link', {
         return {
             isLoading: true,
             showLinkModal: false,
-            linkHref: "",
+            linkHref: '',
             linkTarget: null,
-            linkType: "link",
+            linkType: 'link',
             categoryCollection: null,
             displayAsButton: false,
             buttonVariant: 'primary',
@@ -99,7 +98,7 @@ Shopware.Component.register('sw-text-editor-toolbar-button-link', {
                     label: this.$t('sw-text-editor-toolbar-button-link.linkOptions.phoneNumber'),
                     value: 'phone',
                 },
-            ]
+            ];
         },
 
         buttonVariantList() {
@@ -124,7 +123,7 @@ Shopware.Component.register('sw-text-editor-toolbar-button-link', {
                     value: 'secondary-sm',
                     label: this.$tc('sw-text-editor-toolbar-button-link.buttonVariantSecondarySmall'),
                 },
-            ]
+            ];
         },
 
         seoUrlReplacePrefix(): string {
@@ -186,22 +185,18 @@ Shopware.Component.register('sw-text-editor-toolbar-button-link', {
             this.showLinkModal = true;
 
             // Get current link from selection
-            this.linkHref = this.editor.getAttributes("link").href as string ?? "";
-            this.linkTarget = this.editor.getAttributes("link").target as string ?? "";
+            this.linkHref = (this.editor.getAttributes('link').href as string) ?? '';
+            this.linkTarget = (this.editor.getAttributes('link').target as string) ?? '';
 
             // Parse link type
-            const {
-                linkType,
-                linkHref,
-            } = await this.parseLink(this.linkHref);
+            const { linkType, linkHref } = await this.parseLink(this.linkHref);
 
             // Parse link class
-            this.displayAsButton = (this.editor.getAttributes("link").class as string)?.includes('btn');
+            this.displayAsButton = (this.editor.getAttributes('link').class as string)?.includes('btn');
 
             if (this.displayAsButton) {
                 this.buttonVariant = this.parseButtonClass();
             }
-
 
             this.linkType = linkType;
             this.linkHref = linkHref;
@@ -211,16 +206,19 @@ Shopware.Component.register('sw-text-editor-toolbar-button-link', {
         },
 
         async parseLink(link: string): Promise<{
-            linkType: LinkCategories,
-            linkHref: string,
+            linkType: LinkCategories;
+            linkHref: string;
         }> {
             const slicedLink = link.slice(0, -1).split('/');
 
-            if (link.startsWith(this.seoUrlReplacePrefix) && [
-                'navigation',
-                'detail',
-                'mediaId',
-            ].includes(slicedLink[1])) {
+            if (
+                link.startsWith(this.seoUrlReplacePrefix) &&
+                [
+                    'navigation',
+                    'detail',
+                    'mediaId',
+                ].includes(slicedLink[1])
+            ) {
                 if (slicedLink[1] === 'navigation') {
                     this.categoryCollection = await this.getCategoryCollection(slicedLink[2]);
                 } else if (slicedLink[1] === 'mediaId') {
@@ -237,26 +235,26 @@ Shopware.Component.register('sw-text-editor-toolbar-button-link', {
                 return {
                     linkType: 'email',
                     linkHref: link.replace('mailto:', ''),
-                }
+                };
             }
 
             if (link.startsWith('tel:')) {
                 return {
                     linkType: 'phone',
                     linkHref: link.replace('tel:', ''),
-                }
+                };
             }
 
             // When nothing was found use "link" as default
             return {
                 linkType: 'link',
                 linkHref: link,
-            }
+            };
         },
 
         parseButtonClass(): string {
             // Get the correct button type from the class
-            const fullButtonClass = this.editor.getAttributes("link").class as string ?? '';
+            const fullButtonClass = (this.editor.getAttributes('link').class as string) ?? '';
             const buttonClasses = fullButtonClass.split(' ');
 
             const buttonVariant = this.buttonVariantList.find((variant) => {
@@ -295,11 +293,7 @@ Shopware.Component.register('sw-text-editor-toolbar-button-link', {
         },
 
         removeLink() {
-            this.editor
-                .chain()
-                .focus()
-                .unsetLink()
-                .run();
+            this.editor.chain().focus().unsetLink().run();
 
             this.showLinkModal = false;
         },

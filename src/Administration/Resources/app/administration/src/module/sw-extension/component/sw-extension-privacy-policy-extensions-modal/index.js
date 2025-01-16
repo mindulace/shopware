@@ -26,9 +26,13 @@ export default {
 
     computed: {
         title() {
-            return this.$tc('sw-extension-store.component.sw-extension-privacy-policy-extensions-modal.title', 0, {
-                extensionLabel: this.extensionName,
-            });
+            return this.$tc(
+                'sw-extension-store.component.sw-extension-privacy-policy-extensions-modal.title',
+                {
+                    extensionLabel: this.extensionName,
+                },
+                0,
+            );
         },
     },
 

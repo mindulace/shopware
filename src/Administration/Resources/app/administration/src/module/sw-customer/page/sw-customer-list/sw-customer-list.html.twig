@@ -292,7 +292,7 @@
                         <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
                         {% block sw_customer_list_delete_modal_confirm_delete_text %}
                         <p class="sw-customer-list__confirm-delete-text">
-                            {{ $tc('sw-customer.list.textDeleteConfirm', 0, { name: `${item.firstName} ${item.lastName}` }) }}
+                            {{ $tc('sw-customer.list.textDeleteConfirm', { name: `${item.firstName} ${item.lastName}` }, 0) }}
                         </p>
                         {% endblock %}
 

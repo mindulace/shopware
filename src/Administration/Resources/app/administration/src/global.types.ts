@@ -36,7 +36,7 @@ import type JsonApiParserService from 'src/core/service/jsonapi-parser.service';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // Needed for the Editor types
 import type { Editor as CoreEditor, EditorOptions } from '@tiptap/core';
-import type Link from "@tiptap/extension-link";
+import type Link from '@tiptap/extension-link';
 /* eslint-enable @typescript-eslint/no-unused-vars */
 import type { ExtensionsState } from './app/state/extensions.store';
 import type { ComponentConfig } from './core/factory/async-component.factory';
@@ -441,7 +441,7 @@ interface CustomProperties extends ServiceContainer, LegacyPublicProperties {
     $store: Store<VuexRootState>;
     // $route: SwRouteLocationNormalizedLoaded,
     // eslint-disable-next-line @typescript-eslint/ban-types
-    $tc: I18n<{}, {}, {}, string, true>['global']['tc'];
+    $tc: I18n<{}, {}, {}, string, true>['global']['t'];
     // eslint-disable-next-line @typescript-eslint/ban-types
     $t: I18n<{}, {}, {}, string, true>['global']['t'];
     $dataScope: () => ComponentInternalInstance['proxy'];

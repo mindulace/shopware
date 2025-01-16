@@ -241,7 +241,7 @@ export default {
 
         createRoutingErrorNotification(name) {
             this.createNotificationError({
-                message: this.$tc('sw-promotion-v2.detail.base.codes.individual.routingError', 0, { name }),
+                message: this.$tc('sw-promotion-v2.detail.base.codes.individual.routingError', { name }, 0),
             });
         },
     },

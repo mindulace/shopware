@@ -168,15 +168,17 @@ const mockNestedItem = {
             id: '7',
             label: 'Nested in level 1 (2)',
             quantity: 1,
-            children: [{
-                ...mockItems[0],
-                id: '8',
-                label: 'Nested in level 2',
-                quantity: 2,
-            }],
+            children: [
+                {
+                    ...mockItems[0],
+                    id: '8',
+                    label: 'Nested in level 2',
+                    quantity: 2,
+                },
+            ],
         },
-    ]
-}
+    ],
+};
 
 const deleteEndpoint = jest.fn(() => Promise.resolve());
 
@@ -294,7 +296,7 @@ async function createWrapper() {
                 'sw-highlight-text': true,
             },
             mocks: {
-                $tc: (t, count, value) => {
+                $tc: (t, value) => {
                     if (t === 'sw-order.detailBase.taxDetail') {
                         return `${value.taxRate}%: ${value.tax}`;
                     }

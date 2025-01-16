@@ -57,7 +57,7 @@ type ActionData = {
 
 type ActionTranslator = {
     // eslint-disable-next-line @typescript-eslint/ban-types
-    $tc: I18n<{}, {}, {}, string, true>['global']['tc'];
+    $tc: I18n<{}, {}, {}, string, true>['global']['t'];
     currentLocale: string;
     getInlineSnippet(value: { [key: string]: string }): string;
 };
@@ -510,20 +510,32 @@ export default class FlowBuilderService {
             sequence: { config },
         } = context;
 
-        let description = translator.$tc('sw-flow.actions.labelTo', 0, {
-            entity: capitalizeString(config?.entity),
-        });
+        let description = translator.$tc(
+            'sw-flow.actions.labelTo',
+            {
+                entity: capitalizeString(config?.entity),
+            },
+            0,
+        );
 
         if (config?.affiliateCode?.upsert || config?.affiliateCode?.value != null) {
-            description = `${description}<br>${translator.$tc('sw-flow.actions.labelAffiliateCode', 0, {
-                affiliateCode: config.affiliateCode.value || '',
-            })}`;
+            description = `${description}<br>${translator.$tc(
+                'sw-flow.actions.labelAffiliateCode',
+                {
+                    affiliateCode: config.affiliateCode.value || '',
+                },
+                0,
+            )}`;
         }
 
         if (config.campaignCode?.upsert || config?.campaignCode?.value != null) {
-            description = `${description}<br>${translator.$tc('sw-flow.actions.labelCampaignCode', 0, {
-                campaignCode: config?.campaignCode?.value || '',
-            })}`;
+            description = `${description}<br>${translator.$tc(
+                'sw-flow.actions.labelCampaignCode',
+                {
+                    campaignCode: config?.campaignCode?.value || '',
+                },
+                0,
+            )}`;
         }
 
         return description;
@@ -567,13 +579,25 @@ export default class FlowBuilderService {
             return '';
         }
 
-        return `${translator.$tc('sw-flow.actions.labelCustomFieldSet', 0, {
-            customFieldSet: translator.getInlineSnippet(customField.config.label) || customFieldSet.name,
-        })}<br>${translator.$tc('sw-flow.actions.labelCustomField', 0, {
-            customField: translator.getInlineSnippet(customField.config.label) || customField.name,
-        })}<br>${translator.$tc('sw-flow.actions.labelCustomFieldOption', 0, {
-            customFieldOption: config.optionLabel,
-        })}`;
+        return `${translator.$tc(
+            'sw-flow.actions.labelCustomFieldSet',
+            {
+                customFieldSet: translator.getInlineSnippet(customField.config.label) || customFieldSet.name,
+            },
+            0,
+        )}<br>${translator.$tc(
+            'sw-flow.actions.labelCustomField',
+            {
+                customField: translator.getInlineSnippet(customField.config.label) || customField.name,
+            },
+            0,
+        )}<br>${translator.$tc(
+            'sw-flow.actions.labelCustomFieldOption',
+            {
+                customFieldOption: config.optionLabel,
+            },
+            0,
+        )}`;
     }
 
     public getSetOrderStateDescription(context: ActionContext) {
@@ -659,9 +683,13 @@ export default class FlowBuilderService {
 
         const mailTemplateData = data.mailTemplates.find((item) => item.id === config.mailTemplateId);
 
-        let mailSendDescription = translator.$tc('sw-flow.actions.labelTemplate', 0, {
-            template: mailTemplateData?.mailTemplateType?.name,
-        });
+        let mailSendDescription = translator.$tc(
+            'sw-flow.actions.labelTemplate',
+            {
+                template: mailTemplateData?.mailTemplateType?.name,
+            },
+            0,
+        );
 
         let mailDescription = mailTemplateData?.description;
 
@@ -669,9 +697,13 @@ export default class FlowBuilderService {
             // Truncate description string
             mailDescription = mailDescription.length > 60 ? `${mailDescription.substring(0, 60)}...` : mailDescription;
 
-            mailSendDescription = `${mailSendDescription}<br>${translator.$tc('sw-flow.actions.labelDescription', 0, {
-                description: mailDescription,
-            })}`;
+            mailSendDescription = `${mailSendDescription}<br>${translator.$tc(
+                'sw-flow.actions.labelDescription',
+                {
+                    description: mailDescription,
+                },
+                0,
+            )}`;
         }
 
         return mailSendDescription;

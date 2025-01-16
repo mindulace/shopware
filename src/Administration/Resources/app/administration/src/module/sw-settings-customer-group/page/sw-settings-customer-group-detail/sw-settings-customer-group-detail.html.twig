@@ -236,7 +236,7 @@
                         <!-- eslint-disable vue/valid-v-model -->
                         <sw-text-field
                             :value="getSeoUrl(seoUrl)"
-                            :label="$tc('sw-settings-customer-group.registration.seoUrlLabel', 0, { salesChannelName: seoUrl.salesChannel.translated.name})"
+                            :label="$tc('sw-settings-customer-group.registration.seoUrlLabel', { salesChannelName: seoUrl.salesChannel.translated.name}, 0)"
                             :copyable="true"
                             :disabled="true"
                         />

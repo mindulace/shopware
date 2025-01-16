@@ -1,8 +1,7 @@
 import { MtTextEditor as MtTextEditorOriginal } from '@shopware-ag/meteor-component-library';
-import type {
-    CustomButton,
-} from "@shopware-ag/meteor-component-library/dist/esm/components/form/mt-text-editor/_internal/mt-text-editor-toolbar";
-import type {PropType} from "vue";
+// eslint-disable-next-line max-len
+import type { CustomButton } from '@shopware-ag/meteor-component-library/dist/esm/components/form/mt-text-editor/_internal/mt-text-editor-toolbar';
+import type { PropType } from 'vue';
 import template from './mt-text-editor.html.twig';
 import './mt-text-editor.scss';
 
@@ -65,7 +64,10 @@ Shopware.Component.register('mt-text-editor', {
         },
     },
 
-    emits: ['update:modelValue', 'update:value'],
+    emits: [
+        'update:modelValue',
+        'update:value',
+    ],
 
     computed: {
         listeners() {
@@ -94,13 +96,19 @@ Shopware.Component.register('mt-text-editor', {
         mergedCustomButtons() {
             const editorButtons: CustomButton[] = [];
 
-            return [...editorButtons, ...this.customButtons];
+            return [
+                ...editorButtons,
+                ...this.customButtons,
+            ];
         },
 
         mergedExcludedButtons() {
             const excludedEditorButtons: string[] = [];
 
-            return [...excludedEditorButtons, ...this.excludedButtons];
+            return [
+                ...excludedEditorButtons,
+                ...this.excludedButtons,
+            ];
         },
     },
 
@@ -121,5 +129,4 @@ Shopware.Component.register('mt-text-editor', {
             this.$emit('update:modelValue', value);
         },
     },
-
 });

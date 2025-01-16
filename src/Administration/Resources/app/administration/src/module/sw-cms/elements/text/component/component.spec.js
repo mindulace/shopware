@@ -3,7 +3,7 @@
  */
 import { mount } from '@vue/test-utils';
 import { setupCmsEnvironment } from 'src/module/sw-cms/test-utils';
-import {MtTextEditor} from "@shopware-ag/meteor-component-library";
+import { MtTextEditor } from '@shopware-ag/meteor-component-library';
 
 async function createWrapper() {
     return mount(await wrapTestComponent('sw-cms-el-text', { sync: true }), {

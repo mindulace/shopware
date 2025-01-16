@@ -1,6 +1,5 @@
-import type {
-    CustomButton,
-} from "@shopware-ag/meteor-component-library/dist/esm/components/form/mt-text-editor/_internal/mt-text-editor-toolbar";
+// eslint-disable-next-line max-len
+import type { CustomButton } from '@shopware-ag/meteor-component-library/dist/esm/components/form/mt-text-editor/_internal/mt-text-editor-toolbar';
 
 /**
  * @package admin
@@ -23,5 +22,5 @@ export default (getAvailableDataMappings: () => string[]): CustomButton => {
                 return editor.commands.insertContent(`{{ ${dataMapping} }}`);
             },
         })),
-    }
+    };
 };

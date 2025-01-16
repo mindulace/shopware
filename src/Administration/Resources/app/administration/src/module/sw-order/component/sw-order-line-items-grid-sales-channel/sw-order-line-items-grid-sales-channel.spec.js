@@ -218,7 +218,7 @@ async function createWrapper() {
                     'sw-highlight-text': true,
                 },
                 mocks: {
-                    $tc: (t, count, value) => {
+                    $tc: (t, value) => {
                         if (t === 'sw-order.createBase.taxDetail') {
                             return `${value.taxRate}%: ${value.tax}`;
                         }

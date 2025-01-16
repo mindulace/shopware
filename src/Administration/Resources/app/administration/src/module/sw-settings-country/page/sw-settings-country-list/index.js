@@ -82,7 +82,7 @@ export default {
             promise
                 .then(() => {
                     this.createNotificationSuccess({
-                        message: this.$tc('sw-settings-country.detail.messageSaveSuccess', 0, { name: country.name }),
+                        message: this.$tc('sw-settings-country.detail.messageSaveSuccess', { name: country.name }, 0),
                     });
                 })
                 .catch(() => {

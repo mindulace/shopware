@@ -97,6 +97,7 @@ export default class VueAdapter extends ViewAdapter {
                 throw new Error(msg);
             }
         };
+
         // This is a hack for providing the data scope to the components.
         Object.defineProperty(this.app.config.globalProperties, '$dataScope', {
             get: getBlockDataScope,
@@ -126,6 +127,14 @@ export default class VueAdapter extends ViewAdapter {
         this.app.use(router);
         this.app.use(vuexRoot);
         this.app.use(i18n);
+
+        // This is a hack for providing the i18n scope to the components.
+        Object.defineProperty(this.app.config.globalProperties, '$i18n', {
+            get: () => {
+                return i18n.global;
+            },
+            enumerable: true,
+        });
 
         // Custom compatUtils check on component basis
         this.app.use({

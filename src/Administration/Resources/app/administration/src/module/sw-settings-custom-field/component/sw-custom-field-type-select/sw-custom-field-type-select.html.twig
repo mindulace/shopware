@@ -22,7 +22,7 @@
     <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
     {% block sw_custom_field_type_select_options_label %}
     <span>
-        {{ $tc('sw-settings-custom-field.customField.detail.labelOption', 0, { count: (index+1) }) }}
+        {{ $tc('sw-settings-custom-field.customField.detail.labelOption', { count: (index+1) }, 0) }}
     </span>
     {% endblock %}
 

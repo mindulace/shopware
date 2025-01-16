@@ -149,7 +149,7 @@ export default Component.wrapComponentConfig({
             }
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            return this.$tc('sw-order.initialModal.customerGrid.textEmptySearch', 0, { name: this.term });
+            return this.$t('sw-order.initialModal.customerGrid.textEmptySearch', { name: this.term }, 0);
         },
 
         cart(): Cart {

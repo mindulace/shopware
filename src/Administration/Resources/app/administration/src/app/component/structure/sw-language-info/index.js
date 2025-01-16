@@ -69,9 +69,13 @@ Component.register('sw-language-info', {
         infoText() {
             // Actual language is system default, because we are creating a new entity
             if (this.isNewEntity) {
-                return this.$tc('sw-language-info.infoTextNewEntity', 0, {
-                    entityDescription: this.entityDescription,
-                });
+                return this.$tc(
+                    'sw-language-info.infoTextNewEntity',
+                    {
+                        entityDescription: this.entityDescription,
+                    },
+                    0,
+                );
             }
 
             if (this.language === null) {
@@ -80,10 +84,14 @@ Component.register('sw-language-info', {
 
             // Actual language is a child language with the root language as fallback
             if (this.language.parentId !== null && this.language.parentId.length > 0) {
-                return this.$tc('sw-language-info.infoTextChildLanguage', 0, {
-                    entityDescription: this.entityDescription,
-                    language: this.language.name,
-                });
+                return this.$tc(
+                    'sw-language-info.infoTextChildLanguage',
+                    {
+                        entityDescription: this.entityDescription,
+                        language: this.language.name,
+                    },
+                    0,
+                );
             }
 
             // Actual language is the system default language
@@ -92,10 +100,14 @@ Component.register('sw-language-info', {
             }
 
             // Actual language is a root language with the system default language as fallback
-            return this.$tc('sw-language-info.infoTextRootLanguage', 0, {
-                entityDescription: this.entityDescription,
-                language: this.language.name,
-            });
+            return this.$tc(
+                'sw-language-info.infoTextRootLanguage',
+                {
+                    entityDescription: this.entityDescription,
+                    language: this.language.name,
+                },
+                0,
+            );
         },
 
         isDefaultLanguage() {

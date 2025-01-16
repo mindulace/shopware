@@ -816,7 +816,7 @@ const createWrapper = async (options = {}) => {
                 'sw-ai-copilot-badge': true,
             },
             mocks: {
-                $tc: (key, pluralization) => {
+                $tc: (key, _, pluralization) => {
                     if (!pluralization) return key;
 
                     switch (key) {

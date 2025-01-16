@@ -43,7 +43,7 @@ export default {
         customTextEditorButtons() {
             return [
                 SwTextEditorToolbarButtonCmsDataMappingButton(() => this.availableDataMappings),
-            ]
+            ];
         },
     },
 

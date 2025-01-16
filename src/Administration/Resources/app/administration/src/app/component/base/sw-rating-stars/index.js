@@ -51,10 +51,14 @@ Component.register('sw-rating-stars', {
     computed: {
         ratingTooltip() {
             return {
-                message: this.$tc('sw-rating-stars.ratingTooltipText', 0, {
-                    actual: this.cappedValue,
-                    max: this.maxStars,
-                }),
+                message: this.$tc(
+                    'sw-rating-stars.ratingTooltipText',
+                    {
+                        actual: this.cappedValue,
+                        max: this.maxStars,
+                    },
+                    0,
+                ),
             };
         },
 
