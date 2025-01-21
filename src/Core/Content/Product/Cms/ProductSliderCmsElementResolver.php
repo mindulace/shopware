@@ -11,7 +11,7 @@ use Shopware\Core\Content\Cms\SalesChannel\Struct\ProductSliderStruct;
 use Shopware\Core\Content\Product\Cms\Utils\ProductSlider\AbstractProductSliderHandler;
 use Shopware\Core\Framework\Log\Package;
 
-#[Package('buyers-experience')]
+#[Package('discovery')]
 class ProductSliderCmsElementResolver extends AbstractCmsElementResolver
 {
     /**

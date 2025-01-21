@@ -84,9 +84,11 @@ class ServiceClientFactoryTest extends TestCase
     {
         $entry = new ServiceRegistryEntry('serviceA', 'description', 'https://example.com', 'appEndpoint', true, 'licenseSyncEndPoint');
         $app = new AppEntity();
+        $app->setId(Uuid::randomHex());
         $app->setSelfManaged(true);
         $app->setAppSecret('app_secret');
         $app->setVersion('1.0.0');
+        $app->setName('TestApp');
         $context = Context::createDefaultContext();
 
         $serviceClientRegistry = static::createMock(ServiceRegistryClient::class);
@@ -126,9 +128,11 @@ class ServiceClientFactoryTest extends TestCase
     {
         $entry = new ServiceRegistryEntry('serviceA', 'description', 'https://example.com', 'appEndpoint', true, 'licenseSyncEndPoint');
         $app = new AppEntity();
+        $app->setId(Uuid::randomHex());
         $app->setSelfManaged(true);
         $app->setAppSecret('app_secret');
         $app->setVersion('1.0.0');
+        $app->setName('TestApp');
 
         $context = Context::createDefaultContext();
 

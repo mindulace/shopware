@@ -26,7 +26,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: 'theme:dump',
     description: 'Dump the theme configuration',
 )]
-#[Package('storefront')]
+#[Package('framework')]
 class ThemeDumpCommand extends Command
 {
     private readonly Context $context;
@@ -131,10 +131,7 @@ class ThemeDumpCommand extends Command
         $dump['domainUrl'] = $domainUrl ?? '';
         $dump['basePath'] = $this->stripProjectDir($fs->location);
 
-        $this->staticFileConfigDumper->prepareDump(
-            $this->projectDir . \DIRECTORY_SEPARATOR . 'var' . \DIRECTORY_SEPARATOR . 'theme-files.json',
-            $dump
-        );
+        $this->staticFileConfigDumper->dumpConfigInVar('theme-files.json', $dump);
 
         $this->staticFileConfigDumper->dumpConfig($this->context);
 
