@@ -237,13 +237,13 @@ class RegisterRoute extends AbstractRegisterRoute
                 'shippingAddressId' => null,
                 'domainId' => $context->getDomainId(),
             ],
-            $context->getSalesChannel()->getId(),
+            $context->getSalesChannelId(),
             $customerEntity->getId()
         );
 
         $new = $this->contextService->get(
             new SalesChannelContextServiceParameters(
-                $context->getSalesChannel()->getId(),
+                $context->getSalesChannelId(),
                 $newToken,
                 $context->getLanguageId(),
                 $context->getCurrencyId(),
