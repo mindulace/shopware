@@ -18,7 +18,7 @@ interface SettingsItem {
 }
 
 /**
- * @package admin
+ * @sw-package framework
  * @private
  */
 const settingsItems = Shopware.Store.register({
