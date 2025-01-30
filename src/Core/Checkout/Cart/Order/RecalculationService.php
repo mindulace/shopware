@@ -8,6 +8,7 @@ use Shopware\Core\Checkout\Cart\CartException;
 use Shopware\Core\Checkout\Cart\CartRuleLoader;
 use Shopware\Core\Checkout\Cart\Delivery\Struct\Delivery;
 use Shopware\Core\Checkout\Cart\Delivery\Struct\DeliveryPosition;
+use Shopware\Core\Checkout\Cart\Event\AdminPromotionCodeRedeemedEvent;
 use Shopware\Core\Checkout\Cart\Exception\CustomerNotLoggedInException;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Order\Transformer\AddressTransformer;
@@ -36,6 +37,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 #[Package('checkout')]
 class RecalculationService
@@ -55,7 +57,8 @@ class RecalculationService
         protected EntityRepository $orderLineItemRepository,
         protected Processor $processor,
         private readonly CartRuleLoader $cartRuleLoader,
-        private readonly PromotionItemBuilder $promotionItemBuilder
+        private readonly PromotionItemBuilder $promotionItemBuilder,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -72,20 +75,12 @@ class RecalculationService
     {
         $order = $this->fetchOrder($orderId, $context);
 
-        $this->validateOrder($order, $orderId);
-        \assert($order instanceof OrderEntity);
-
         $salesChannelContext = $this->orderConverter->assembleSalesChannelContext($order, $context, $salesChannelContextOptions);
         $cart = $this->orderConverter->convertToCart($order, $context);
         $recalculatedCart = $this->recalculateCart($cart, $salesChannelContext);
 
         $shouldIncludeDeliveries = \count($cart->getLineItems()) > 0;
-        $conversionContext = (new OrderConversionContext())
-            ->setIncludeCustomer(false)
-            ->setIncludeBillingAddress(false)
-            ->setIncludeDeliveries($shouldIncludeDeliveries)
-            ->setIncludeTransactions(false)
-            ->setIncludeOrderDate(false);
+        $conversionContext = $this->getOrderConversionContext($shouldIncludeDeliveries);
 
         $orderData = $this->orderConverter->convertToOrder($recalculatedCart, $salesChannelContext, $conversionContext);
         $orderData['id'] = $order->getId();
@@ -127,10 +122,6 @@ class RecalculationService
 
         $order = $this->fetchOrder($orderId, $context);
 
-        $this->validateOrder($order, $orderId);
-
-        \assert($order instanceof OrderEntity);
-
         $salesChannelContext = $this->orderConverter->assembleSalesChannelContext($order, $context);
         $cart = $this->orderConverter->convertToCart($order, $context);
         $cart->add($lineItem);
@@ -142,12 +133,7 @@ class RecalculationService
             $this->addProductToDeliveryPosition($new, $recalculatedCart);
         }
 
-        $conversionContext = (new OrderConversionContext())
-            ->setIncludeCustomer(false)
-            ->setIncludeBillingAddress(false)
-            ->setIncludeDeliveries(true)
-            ->setIncludeTransactions(false)
-            ->setIncludeOrderDate(false);
+        $conversionContext = $this->getOrderConversionContext(true);
 
         $orderData = $this->orderConverter->convertToOrder($recalculatedCart, $salesChannelContext, $conversionContext);
         $orderData['id'] = $order->getId();
@@ -170,21 +156,13 @@ class RecalculationService
     {
         $order = $this->fetchOrder($orderId, $context);
 
-        $this->validateOrder($order, $orderId);
-        \assert($order instanceof OrderEntity);
-
         $salesChannelContext = $this->orderConverter->assembleSalesChannelContext($order, $context);
         $cart = $this->orderConverter->convertToCart($order, $context);
         $cart->add($lineItem);
 
         $recalculatedCart = $this->recalculateCart($cart, $salesChannelContext);
 
-        $conversionContext = (new OrderConversionContext())
-            ->setIncludeCustomer(false)
-            ->setIncludeBillingAddress(false)
-            ->setIncludeDeliveries(false)
-            ->setIncludeTransactions(false)
-            ->setIncludeOrderDate(false);
+        $conversionContext = $this->getOrderConversionContext();
 
         $orderData = $this->orderConverter->convertToOrder($recalculatedCart, $salesChannelContext, $conversionContext);
         $orderData['id'] = $order->getId();
@@ -198,13 +176,6 @@ class RecalculationService
     public function addPromotionLineItem(string $orderId, string $code, Context $context): Cart
     {
         $order = $this->fetchOrder($orderId, $context);
-
-        $this->validateOrder($order, $orderId);
-        \assert($order instanceof OrderEntity);
-
-        $options = [
-            SalesChannelContextService::PERMISSIONS => OrderConverter::ADMIN_EDIT_ORDER_PERMISSIONS,
-        ];
 
         $options[SalesChannelContextService::PERMISSIONS] = \array_merge(
             OrderConverter::ADMIN_EDIT_ORDER_PERMISSIONS,
@@ -226,12 +197,7 @@ class RecalculationService
         $cart->add($promotionLineItem);
         $recalculatedCart = $this->recalculateCart($cart, $salesChannelContext);
 
-        $conversionContext = (new OrderConversionContext())
-            ->setIncludeCustomer(false)
-            ->setIncludeBillingAddress(false)
-            ->setIncludeDeliveries(false)
-            ->setIncludeTransactions(false)
-            ->setIncludeOrderDate(false);
+        $conversionContext = $this->getOrderConversionContext();
 
         $orderData = $this->orderConverter->convertToOrder($recalculatedCart, $salesChannelContext, $conversionContext);
         $orderData['id'] = $order->getId();
@@ -241,19 +207,16 @@ class RecalculationService
             $this->orderRepository->upsert([$orderData], $context);
         });
 
+        $this->eventDispatcher->dispatch(
+            new AdminPromotionCodeRedeemedEvent($context, $this->fetchOrder($order->getId(), $context))
+        );
+
         return $recalculatedCart;
     }
 
     public function toggleAutomaticPromotion(string $orderId, Context $context, bool $skipAutomaticPromotions = true): Cart
     {
         $order = $this->fetchOrder($orderId, $context);
-
-        $this->validateOrder($order, $orderId);
-        \assert($order instanceof OrderEntity);
-
-        $options = [
-            SalesChannelContextService::PERMISSIONS => OrderConverter::ADMIN_EDIT_ORDER_PERMISSIONS,
-        ];
 
         $options[SalesChannelContextService::PERMISSIONS] = \array_merge(
             OrderConverter::ADMIN_EDIT_ORDER_PERMISSIONS,
@@ -273,12 +236,7 @@ class RecalculationService
 
         $recalculatedCart = $this->recalculateCart($cart, $salesChannelContext);
 
-        $conversionContext = (new OrderConversionContext())
-            ->setIncludeCustomer(false)
-            ->setIncludeBillingAddress(false)
-            ->setIncludeDeliveries(!$skipAutomaticPromotions)
-            ->setIncludeTransactions(false)
-            ->setIncludeOrderDate(false);
+        $conversionContext = $this->getOrderConversionContext(!$skipAutomaticPromotions);
 
         $orderData = $this->orderConverter->convertToOrder($recalculatedCart, $salesChannelContext, $conversionContext);
         $orderData['id'] = $order->getId();
@@ -333,7 +291,7 @@ class RecalculationService
         $delivery->getPositions()->add($position);
     }
 
-    private function fetchOrder(string $orderId, Context $context): ?OrderEntity
+    private function fetchOrder(string $orderId, Context $context): OrderEntity
     {
         $criteria = (new Criteria([$orderId]))
             ->addAssociation('lineItems.downloads')
@@ -344,7 +302,13 @@ class RecalculationService
             ->addAssociation('deliveries.shippingOrderAddress.country')
             ->addAssociation('deliveries.shippingOrderAddress.countryState');
 
-        return $this->orderRepository->search($criteria, $context)->getEntities()->get($orderId);
+        $order = $this->orderRepository->search($criteria, $context)->getEntities()->get($orderId);
+
+        $this->validateOrder($order, $orderId);
+
+        \assert($order instanceof OrderEntity);
+
+        return $order;
     }
 
     /**
@@ -408,5 +372,15 @@ class RecalculationService
 
             return $validated->getCart();
         });
+    }
+
+    private function getOrderConversionContext(bool $shouldIncludeDeliveries = false): OrderConversionContext
+    {
+        return (new OrderConversionContext())
+            ->setIncludeCustomer(false)
+            ->setIncludeBillingAddress(false)
+            ->setIncludeDeliveries($shouldIncludeDeliveries)
+            ->setIncludeTransactions(false)
+            ->setIncludeOrderDate(false);
     }
 }

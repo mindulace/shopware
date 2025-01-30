@@ -5,6 +5,7 @@ namespace Shopware\Tests\Unit\Core\Checkout\Promotion\Subscriber;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Checkout\Cart\Event\AdminPromotionCodeRedeemedEvent;
 use Shopware\Core\Checkout\Cart\Event\CheckoutOrderPlacedEvent;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -14,6 +15,7 @@ use Shopware\Core\Checkout\Promotion\Aggregate\PromotionIndividualCode\Promotion
 use Shopware\Core\Checkout\Promotion\Aggregate\PromotionIndividualCode\PromotionIndividualCodeEntity;
 use Shopware\Core\Checkout\Promotion\Cart\PromotionProcessor;
 use Shopware\Core\Checkout\Promotion\Subscriber\PromotionIndividualCodeRedeemer;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -31,9 +33,9 @@ class PromotionIndividualCodeRedeemerTest extends TestCase
 {
     /**
      * This test verifies that our subscriber has the
-     * correct event that its listening to.
+     * correct event that it's listening to.
      * This is important, because we have to ensure that
-     * we save meta data in the payload of the line item
+     * we save metadata in the payload of the line item
      * when the order is created.
      * This payload data helps us to reference used individual codes
      * with placed orders.
@@ -41,10 +43,9 @@ class PromotionIndividualCodeRedeemerTest extends TestCase
     #[Group('promotions')]
     public function testSubscribeToOrderLineItemWritten(): void
     {
-        $expectedEvent = CheckoutOrderPlacedEvent::class;
-
         // we need to have a key for the Shopware event
-        static::assertArrayHasKey($expectedEvent, PromotionIndividualCodeRedeemer::getSubscribedEvents());
+        static::assertArrayHasKey(CheckoutOrderPlacedEvent::class, PromotionIndividualCodeRedeemer::getSubscribedEvents());
+        static::assertArrayHasKey(AdminPromotionCodeRedeemedEvent::class, PromotionIndividualCodeRedeemer::getSubscribedEvents());
     }
 
     public function testOnOrderCreateWithOtherLineItem(): void
@@ -119,6 +120,89 @@ class PromotionIndividualCodeRedeemerTest extends TestCase
         $event = new CheckoutOrderPlacedEvent($context, $order);
 
         $redeemer->onOrderPlaced($event);
+
+        static::assertSame([[[
+            'id' => $code->getId(),
+            'payload' => [
+                'orderId' => $order->getId(),
+                'customerId' => $customer->getCustomerId(),
+                'customerName' => 'foo bar',
+            ],
+        ]]], $repository->updates);
+    }
+
+    public function testOnCodeRedeemed()
+    {
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects(static::never())->method('search');
+        $repository->expects(static::never())->method('searchIds');
+        $redeemer = new PromotionIndividualCodeRedeemer($repository);
+
+        $lineItem = new OrderLineItemEntity();
+        $lineItem->setId(Uuid::randomHex());
+        $lineItem->setType('test');
+        $order = new OrderEntity();
+        $order->setLineItems(new OrderLineItemCollection([$lineItem]));
+
+        $context = Context::createDefaultContext();
+
+        $event = new AdminPromotionCodeRedeemedEvent($context, $order);
+
+        $redeemer->onCodeRedeemed($event);
+    }
+
+    public function testOnCodeRedeemedWillProcessMultipleCodes(): void
+    {
+        $code = new PromotionIndividualCodeEntity();
+        $code->setId(Uuid::randomHex());
+
+        /** @var StaticEntityRepository<PromotionIndividualCodeCollection> $repository */
+        $repository = new StaticEntityRepository([
+            static function (Criteria $criteria) {
+                $filter = $criteria->getFilters()[0];
+                static::assertInstanceOf(EqualsFilter::class, $filter);
+                static::assertSame('notexisting', $filter->getValue());
+
+                return new PromotionIndividualCodeCollection();
+            },
+            static function (Criteria $criteria) use ($code) {
+                $filter = $criteria->getFilters()[0];
+                static::assertInstanceOf(EqualsFilter::class, $filter);
+                static::assertSame('existing', $filter->getValue());
+
+                return new PromotionIndividualCodeCollection([$code]);
+            },
+        ]);
+        $redeemer = new PromotionIndividualCodeRedeemer($repository);
+
+        $order = new OrderEntity();
+        $order->setId(Uuid::randomHex());
+        $customer = new OrderCustomerEntity();
+        $customer->setId(Uuid::randomHex());
+        $customer->setFirstName('foo');
+        $customer->setLastName('bar');
+        $customer->setCustomerId(Uuid::randomHex());
+        $order->setOrderCustomer($customer);
+
+        $lineItem1 = new OrderLineItemEntity();
+        $lineItem1->setId(Uuid::randomHex());
+        $lineItem1->setType(PromotionProcessor::LINE_ITEM_TYPE);
+        $lineItem1->setPayload(['code' => 'notexisting']);
+        $lineItem1->setOrderId($order->getId());
+
+        $lineItem2 = new OrderLineItemEntity();
+        $lineItem2->setId(Uuid::randomHex());
+        $lineItem2->setType(PromotionProcessor::LINE_ITEM_TYPE);
+        $lineItem2->setPayload(['code' => 'existing']);
+        $lineItem2->setOrderId($order->getId());
+
+        $order->setLineItems(new OrderLineItemCollection([$lineItem1, $lineItem2]));
+
+        $context = Context::createDefaultContext();
+
+        $event = new AdminPromotionCodeRedeemedEvent($context, $order);
+
+        $redeemer->onCodeRedeemed($event);
 
         static::assertSame([[[
             'id' => $code->getId(),

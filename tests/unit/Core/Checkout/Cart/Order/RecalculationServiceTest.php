@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartBehavior;
 use Shopware\Core\Checkout\Cart\CartRuleLoader;
+use Shopware\Core\Checkout\Cart\Event\AdminPromotionCodeRedeemedEvent;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Order\OrderConversionContext;
 use Shopware\Core\Checkout\Cart\Order\OrderConverter;
@@ -41,6 +42,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\Test\Generator;
 use Shopware\Core\Test\Stub\DataAbstractionLayer\StaticEntityRepository;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @internal
@@ -55,6 +57,8 @@ class RecalculationServiceTest extends TestCase
     private CartRuleLoader&MockObject $cartRuleLoader;
 
     private Context $context;
+
+    private EventDispatcherInterface&MockObject $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -76,6 +80,7 @@ class RecalculationServiceTest extends TestCase
 
         $this->cartRuleLoader = $this->createMock(CartRuleLoader::class);
         $this->context = Context::createDefaultContext();
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
     }
 
     public function testRecalculateOrderWithTaxStatus(): void
@@ -165,7 +170,8 @@ class RecalculationServiceTest extends TestCase
             $entityRepository,
             $this->createMock(Processor::class),
             $this->cartRuleLoader,
-            $this->createMock(PromotionItemBuilder::class)
+            $this->createMock(PromotionItemBuilder::class),
+            $this->eventDispatcher
         );
 
         $recalculationService->recalculateOrder($orderEntity->getId(), $this->context);
@@ -218,7 +224,8 @@ class RecalculationServiceTest extends TestCase
             $entityRepository,
             $this->createMock(Processor::class),
             $this->cartRuleLoader,
-            $this->createMock(PromotionItemBuilder::class)
+            $this->createMock(PromotionItemBuilder::class),
+            $this->eventDispatcher
         );
 
         $recalculationService->addProductToOrder($order->getId(), $productEntity->getId(), 1, $this->context);
@@ -258,7 +265,8 @@ class RecalculationServiceTest extends TestCase
             $entityRepository,
             $this->createMock(Processor::class),
             $this->cartRuleLoader,
-            $this->createMock(PromotionItemBuilder::class)
+            $this->createMock(PromotionItemBuilder::class),
+            $this->eventDispatcher
         );
 
         $recalculationService->addCustomLineItem($order->getId(), $lineItem, $this->context);
@@ -313,7 +321,8 @@ class RecalculationServiceTest extends TestCase
             $entityRepository,
             $processor,
             $this->cartRuleLoader,
-            $this->createMock(PromotionItemBuilder::class)
+            $this->createMock(PromotionItemBuilder::class),
+            $this->eventDispatcher
         );
 
         $recalculationService->addProductToOrder($order->getId(), $productEntity->getId(), 1, $this->context);
@@ -332,6 +341,7 @@ class RecalculationServiceTest extends TestCase
         $entityRepository = $this->createMock(EntityRepository::class);
         $entityRepository->method('search')->willReturnOnConsecutiveCalls(
             new EntitySearchResult('order', 1, new OrderCollection([$order]), null, new Criteria(), $this->salesChannelContext->getContext()),
+            new EntitySearchResult('order', 1, new OrderCollection([$order]), null, new Criteria(), $this->salesChannelContext->getContext()),
         );
 
         $entityRepository
@@ -345,6 +355,11 @@ class RecalculationServiceTest extends TestCase
                 ]), []);
             });
 
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects(static::once())
+            ->method('dispatch')
+            ->with(static::isInstanceOf(AdminPromotionCodeRedeemedEvent::class));
+
         $recalculationService = new RecalculationService(
             $entityRepository,
             $this->orderConverter,
@@ -355,7 +370,8 @@ class RecalculationServiceTest extends TestCase
             $entityRepository,
             $this->createMock(Processor::class),
             $this->cartRuleLoader,
-            $this->createMock(PromotionItemBuilder::class)
+            $this->createMock(PromotionItemBuilder::class),
+            $eventDispatcher
         );
 
         $recalculationService->addPromotionLineItem($order->getId(), '', $this->context);
@@ -391,7 +407,8 @@ class RecalculationServiceTest extends TestCase
             $entityRepository,
             $this->createMock(Processor::class),
             $this->cartRuleLoader,
-            $this->createMock(PromotionItemBuilder::class)
+            $this->createMock(PromotionItemBuilder::class),
+            $this->eventDispatcher
         );
 
         $recalculationService->toggleAutomaticPromotion($order->getId(), $this->context, false);
@@ -444,7 +461,8 @@ class RecalculationServiceTest extends TestCase
             $entityRepository,
             $this->createMock(Processor::class),
             $this->cartRuleLoader,
-            $this->createMock(PromotionItemBuilder::class)
+            $this->createMock(PromotionItemBuilder::class),
+            $this->eventDispatcher
         );
 
         $recalculationService->recalculateOrder($orderEntity->getId(), $this->context);
